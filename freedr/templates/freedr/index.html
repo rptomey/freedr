@@ -1,0 +1,55 @@
+{% extends "freedr/layout.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <section class="feed-container">
+            {% for entry in page_obj %}
+                <article class="feed-entry">
+                    <h2 class="entry-title">
+                        {% if entry.link in user.bookmarked_urls %}
+                        <button class="bookmark-button saved" onclick="toggleBookmark(this)">
+                        {% else %}
+                        <button class="bookmark-button unsaved" onclick="toggleBookmark(this)">
+                        {% endif %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="bookmark" viewBox="28 13 24 29">
+                                <path d="M 30 40 L 30 15 L 50 15 L 50 40 L 40 30 L 30 40 Z"/>
+                            </svg>
+                        </button>
+                        <a class="entry-link" href="{{ entry.link }}" target="_blank" rel="noopener noreferrer">{{ entry.title }}</a>
+                    </h2>
+                    <div class="entry-publication">
+                        <a class="publication-badge-link" href="{% url 'feed' entry.feed_id %}">
+                            <span>{{ entry.publication_concise }}</span>
+                        </a>
+                    </div>
+                    <div class="entry-details">
+                        <small class="entry-published">{{ entry.published|date:"D. d M Y @ P" }}</small>
+                        <small class="entry-author">- {{ entry.author }}</small>
+                    </div>
+                    <div class="entry-description">{{ entry.description|safe }}</div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination-container">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+            
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </nav>
+    {% endif %}
+{% endblock %}

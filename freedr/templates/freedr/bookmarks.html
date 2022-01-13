@@ -1,0 +1,59 @@
+{% extends "freedr/layout.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <section class="bookmarks-info-container">
+            <article class="bookmarks-info">
+                <h2>Bookmarks</h2>
+                <p>You have {{ user.bookmark_count }} article(s) bookmarked out of a maximum of 30.</p>
+                <small>Note: if you add a bookmark while at your max limit, your oldest bookmark will be removed.</small>
+            </article>
+        </section>
+        <section class="feed-container">
+            {% for entry in page_obj %}
+                <article class="feed-entry">
+                    <h2 class="entry-title">
+                        {% if entry.url in user.bookmarked_urls %}
+                        <button class="bookmark-button saved" onclick="toggleBookmark(this)">
+                        {% else %}
+                        <button class="bookmark-button unsaved" onclick="toggleBookmark(this)">
+                        {% endif %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="bookmark" viewBox="28 13 24 29">
+                                <path d="M 30 40 L 30 15 L 50 15 L 50 40 L 40 30 L 30 40 Z"/>
+                            </svg>
+                        </button>
+                        <a class="entry-link" href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.title }}</a>
+                    </h2>
+                    <div class="entry-publication">
+                        <span>{{ entry.feed_name }}</span>
+                    </div>
+                    <div class="entry-details">
+                        <small class="entry-saved">Bookmarked {{ entry.date_added|date:"D. d M Y @ P" }}</small>
+                    </div>
+                    <div class="entry-description">{{ entry.description|safe }}</div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination-container">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+            
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </nav>
+    {% endif %}
+{% endblock %}

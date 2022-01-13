@@ -1,0 +1,61 @@
+{% extends "freedr/layout.html" %}
+
+{% block body %}
+    <section class="add-sub-form-container">
+        <h2>Add Subscription</h2>
+        <form id="add-sub-form" action="{% url 'subscribe' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input class="form-control" type="text" name="url" maxlength="500" placeholder="RSS Feed URL">
+            </div>
+            <input class="btn btn-primary" type="submit" value="Add">
+        </form>
+    </section>
+
+    {% if top_feeds %}
+    <section class="sub-table-container">
+        <h2>Most Popular Feeds</h2>
+        <table class="sub-table" id="current-subscriptions">
+            <thead>
+                <th scope="col">Name</th>
+                <th scope="col" width="23%">Feed URL</th>
+                <th scope="col">Description</th>
+            </thead>
+            <tbody>
+                {% for feed in top_feeds %}
+                    <tr>
+                        <td><a class="sub-table-link" href="{% url 'feed' feed.id %}">{{ feed.name }}</a></td>
+                        <td class="break">{{ feed.feed_url }}</td>
+                        <td>{{ feed.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% endif %}
+
+    {% if user.subscription_count >= 1 %}
+    <section class="sub-table-container">
+        <h2>Current Subscriptions</h2>
+        <table class="sub-table" id="current-subscriptions">
+            <thead>
+                <th scope="col">Name</th>
+                <th scope="col" width="23%">Feed URL</th>
+                <th scope="col">Description</th>
+                <th scope="col"></th>
+            </thead>
+            <tbody>
+                {% for sub in user.all_subscriptions %}
+                    <tr>
+                        <td><a class="sub-table-link" href="{% url 'feed' sub.id %}">{{ sub.name }}</a></td>
+                        <td class="break">{{ sub.feed_url }}</td>
+                        <td>{{ sub.description }}</td>
+                        <td><a class="sub-table-unsubscribe" href="{% url 'unsubscribe' sub.id %}">Unsubscribe</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% endif %}
+
+{% endblock %}
